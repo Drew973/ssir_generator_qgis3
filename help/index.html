@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+    <body>
+        <h2 id="home">Overview</h2>
+
+        <p>Plugin for generating skid site investigation reports.<p>
+		<p>Each site has up to 1 report and corresponds to 1 feature on a layer.<p>	
+
+</p>
+
+
+
+<h2>How to use</h2>
+
+<h4>Set the layer</h4>
+
+<p>Import a layer with the <a href="layer.html"> correct fields</a><p>
+<p>Set layer to this.<p>
+
+<h4>Surveyed/Unsurveyed</h4>
+<p>The Surveyed/Unsurveyed button will change the layer style to display surveyed and unsurveyed features differently.(rule based, features with a value in the "csv" field are considered to be surveyed).<p>
+
+
+<h4>Changing site</h4>
+
+<p> Change site to load an existing report or reset the form.<p>
+<p> The plugin will try to load the csv in the "csv" field of the corresponding feature.<p>
+
+<p>If the plugin cannot find a csv it will set the form. Default values for site details come from the feature.<p>
+
+<p>Change site by setting a value and clicking "change to segment" or by selecting 1 feature on the layer and clicking "change to selected segment".<p>
+<p> Changing site will lose any unsaved changes.<p>
+
+
+<h4>Fill the form</h4>
+<p> Values can be temporarily added to dropdowns by typing in value and pressing enter. <p>
+
+<h4>Save the form</h4>
+<p>Click save... button to save. Reports are output as csv files with 1 row per site. Multiple sites can be saved to the same csv. Saving will set the "csv" field of the feature.<p>
+
+      
+</body>
+</html>
