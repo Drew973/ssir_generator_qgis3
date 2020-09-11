@@ -24,7 +24,7 @@ from qgis.utils import iface
 
 import csv
 import collections
-from qgis.core import QgsFeatureRequest
+from qgis.core import QgsFeatureRequest,QgsProject,QgsMapLayerProxyModel,QgsRasterLayer
 
 
 
@@ -67,6 +67,11 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.site_box.setEditable(True)
 
 
+#WritableLayer,VectorLayer,PointLayer
+        self.layer_box.setFilters(QgsMapLayerProxyModel.VectorLayer|QgsMapLayerProxyModel.PointLayer)
+        self.filter_layers()
+        QgsProject.instance().layersAdded.connect(self.filter_layers)
+        
         
         #special handling for comboboxes
         for k,v in self.key.items():
@@ -89,6 +94,27 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.layer_changed(self.layer_box.currentLayer())
         self.next_site_button.clicked.connect(self.next_site)
         self.last_site_button.clicked.connect(self.last_site)
+
+
+        
+
+        
+    def filter_layers(self):
+        #ex=[]
+        #iterating through layers already in box results in already exepted layers missing
+        #for i in range(0,self.layer_box.count()):
+            #layer=self.layer_box.layer(i)
+            #if layer:
+                
+              #  if not layer_valid(layer):
+             #       print('invalid:'+layer.name())
+            #        ex.append(layer)
+           #     else:
+          #          print('valid:'+layer.name())
+         #   
+        #self.layer_box.setExceptedLayerList(ex+self.layer_box.exceptedLayerList())
+        self.layer_box.setExceptedLayerList([layer for layer in QgsProject.instance().mapLayers().values() if not layer_valid(layer)])   #QgsMapLayerRegistry.instance().mapLayers().values() for qgis2
+
 
 
 
@@ -285,7 +311,7 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         d['end_ch']=f['end_ch']
         d['section_length']=f['sec_len']
         d['assesment_length']=f['assess_len']
-
+        d['survey_date']=QDate.currentDate().toString(widget_value.DATE_FORMAT)
         self.load_dict(d)
 
 
@@ -372,13 +398,26 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         layer_functions.zoom_to_selected(self.layer_box.currentLayer())
 
 
+
+req_fields={'segment_no':{'types':['int','float']},'sec_label':{'types':['text']},'st_ch':{'types':['int','float']},
+            'end_ch':{'types':['int','float']},'sec_len':{'types':['int','float']},'assess_len':{'types':['int','float']},'csv':{'types':['text']}}
+
+        #d['site']=int(f['segment_no'])
+        #d['section']=f['sec_label']
+        #d['start_ch']=f['st_ch']
+        #d['end_ch']=f['end_ch']
+        #d['section_length']=f['sec_len']
+        #d['assesment_length']=f['assess_len']
+
+
 def layer_valid(layer):
-    if layer.fields().indexOf('segment_no')==-1:
+
+    if isinstance(layer,QgsRasterLayer):
         return False
-    
-    if layer.fields().indexOf('csv')==-1:
-        return False
-    
+
+    for f in req_fields:
+        if layer.fields().indexOf(f)==-1:
+            return False           
     return True
     
 

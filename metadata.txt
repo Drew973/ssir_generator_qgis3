@@ -8,9 +8,9 @@
 
 [general]
 name=SSIR Generator
-qgisMinimumVersion=3.1
+qgisMinimumVersion=3.0
 description=plugin for writing site scid investigation reports
-version=3.11
+version=3.21
 author=Drew
 email=drew.bennett@ptsinternational.co.uk
 

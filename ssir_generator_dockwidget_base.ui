@@ -27,7 +27,7 @@
       <item>
        <widget class="QgsMapLayerComboBox" name="layer_box">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Layer with sites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Layer with sites. Only showing layers with correct fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -207,8 +207,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>550</width>
-           <height>310</height>
+           <width>188</width>
+           <height>116</height>
           </rect>
          </property>
          <attribute name="label">
@@ -269,8 +269,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>550</width>
-           <height>310</height>
+           <width>353</width>
+           <height>194</height>
           </rect>
          </property>
          <attribute name="label">
@@ -442,8 +442,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>550</width>
-           <height>310</height>
+           <width>323</width>
+           <height>90</height>
           </rect>
          </property>
          <attribute name="label">
@@ -519,8 +519,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>550</width>
-           <height>310</height>
+           <width>346</width>
+           <height>116</height>
           </rect>
          </property>
          <attribute name="label">
@@ -615,8 +615,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>550</width>
-           <height>310</height>
+           <width>395</width>
+           <height>116</height>
           </rect>
          </property>
          <attribute name="label">
