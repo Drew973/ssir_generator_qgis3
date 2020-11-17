@@ -50,14 +50,10 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def __init__(self, parent=None):
         super(ssirGeneratorDockWidget, self).__init__(parent)
 
-
         self.site=None
-    
         self.setupUi(self)
         self.from_selected_button.clicked.connect(self.from_selected)
-
         self.save_button.clicked.connect(self.save)
-
         self.clear_button.clicked.connect(self.clear)
         
         self.init_key()
@@ -245,7 +241,9 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         self.clear()
             else:
                 iface.messageBar().pushMessage('ssir generator:segment_no %d not in layer.'%(new_site))
-                self.site_box.setValue(self.site)
+                i=self.site_box.findText(str(self.site))
+                if i!=-1:
+                    self.site_box.setCurrentIndex(i)
 
 
 
