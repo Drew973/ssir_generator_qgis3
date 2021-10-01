@@ -164,7 +164,7 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
 
 
     def save(self):
-        p = file_dialogs.save_file_dialog(ext='.csv',caption='save as csv',default_name=str(self.site()))
+        p = file_dialogs.save_file_dialog(ext='.csv',caption='save as csv',default_name=str(self.site()),options=QFileDialog.DontConfirmOverwrite)
         
         if p:
 

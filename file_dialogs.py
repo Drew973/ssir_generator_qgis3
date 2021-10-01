@@ -31,13 +31,16 @@ def load_files_dialog(ext='',caption=''):
         return []
 
 
-def save_file_dialog(ext='',caption='',default_name=''):
+def save_file_dialog(ext='',caption='',default_name='',options=None):
     folder=settings.value('folder','',str)
     
     if folder=='':
         folder=path.expanduser('~\\Documents')#path to users documents
 
-    p=QFileDialog.getSaveFileName(caption=caption,filter='*'+ext+';;*',directory=path.join(folder,default_name))[0]#(path,filter) for pyqt5
+    if options:
+        p = QFileDialog.getSaveFileName(caption=caption,filter='*'+ext+';;*',directory=path.join(folder,default_name),options=options)[0]#(path,filter) for pyqt5
+    else:
+        p = QFileDialog.getSaveFileName(caption=caption,filter='*'+ext+';;*',directory=path.join(folder,default_name))[0]#(path,filter) for pyqt5
     #p=QFileDialog.getSaveFileName(caption=caption,filter='*'+ext+';;*',directory=path.join(folder,default_name))#(path,filter) for pyqt4
 
     if p!='':
