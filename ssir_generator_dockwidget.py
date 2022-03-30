@@ -21,7 +21,7 @@ import os
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal,QDate,QUrl,Qt
 
-from PyQt5.QtWidgets import QComboBox,QLineEdit,QCompleter,QMenu
+from PyQt5.QtWidgets import QComboBox,QLineEdit,QMenu
 from qgis.PyQt.QtWidgets import QFileDialog
 
 from . import widget_value,layer_functions,file_dialogs
@@ -30,7 +30,7 @@ from qgis.utils import iface
 
 import csv
 import collections
-from qgis.core import QgsFeatureRequest,QgsProject,QgsMapLayerProxyModel,QgsRasterLayer
+from qgis.core import QgsMapLayerProxyModel
 
 
 from . ssir_generator_dockwidget_base import Ui_ssir_generatorDockWidgetBase
@@ -50,11 +50,8 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         self.initKey()
         self.help_button.clicked.connect(self.openHelp)
 
-#WritableLayer,VectorLayer,PointLayer
         self.layer_box.setFilters(QgsMapLayerProxyModel.VectorLayer|QgsMapLayerProxyModel.PointLayer)
         
-        #redo layerbox. doesn't notice when invalid layer becomes valid.
-        #subclass to fix this. did this somewhere?
         
         #special handling for comboboxes
         for k,v in self.key.items():
@@ -67,24 +64,23 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
                         
         self.rules = (('Surveyed', 'not "csv" is null', 'green', None),('Unsurveyed', '"csv" is null', 'red', None))#rules for symbology
         self.split_button.clicked.connect(lambda:layer_functions.set_rules(self.layer_box.currentLayer(),self.rules))#change symbology
-        self.layer_box.layerChanged.connect(self.layerChanged)
+        self.layer_box.layerChanged.connect(lambda layer:self.siteBox.setField('site',layer))
 
-        self.layerChanged(self.layer_box.currentLayer())
+        self.siteBox.setField('site',self.layer_box.currentLayer())
 
         self.siteBox.currentIndexChanged.connect(self.siteBoxChanged)
         
-        self.next_site_button.clicked.connect(self.nextSite)
-        self.last_site_button.clicked.connect(self.lastSite)
-
+        self.nextButton.clicked.connect(self.siteBox.next)
+        self.lastButton.clicked.connect(self.siteBox.last)
 
         siteMenu = QMenu(self)
         zoomAct = siteMenu.addAction('Zoom to site')
-        zoomAct.triggered.connect(self.zoom)
+        zoomAct.triggered.connect(self.siteBox.selectOnLayer)
         
-        fromSelectedAct = siteMenu.addAction('Change to selected feature')
-        fromSelectedAct.triggered.connect(self.fromSelected)
+        fromSelectedAct = siteMenu.addAction('Change to selected feature of layer')
+        fromSelectedAct.triggered.connect(self.siteBox.fromLayer)
         
-        self.siteBox.setContextMenuPolicy(Qt.CustomContextMenu);
+        self.siteBox.setContextMenuPolicy(Qt.CustomContextMenu)
         self.siteBox.customContextMenuRequested.connect(lambda pt:siteMenu.exec_(self.mapToGlobal(pt)))
         
 
@@ -138,74 +134,44 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         event.accept()
     
 
-
-    def layerChanged(self,layer):
-
-        if not layer:
-            iface.messageBar().pushMessage('ssir generator:no layer')
-            return
-            
-        if layerValid(layer):
-            self.siteBox.clear()
-            s = self.segments()
-            self.siteBox.addItems(s)
-            self.siteBox.setCompleter(QCompleter(s))
-            #self.siteBox.setCurrentIndex(self.siteBox.currentIndex())#value in site_box might not change. site_box_changed might be called twice
-
-        else:
-            iface.messageBar().pushMessage('ssir generator:layer needs fields segment_no and csv')
-
-
     def save(self):
-        p = file_dialogs.save_file_dialog(ext='.csv',caption='save as csv',default_name=str(self.site()),options=QFileDialog.DontConfirmOverwrite)
+        p = file_dialogs.save_file_dialog(ext='.csv',caption='save as csv',default_name=str(self.siteBox.currentValue()),options=QFileDialog.DontConfirmOverwrite)
         
         if p:
-
             self.toCsv(p)
             iface.messageBar().pushMessage('ssir generator:saved to '+p)
 
             #setting 'csv' field of feature
-            self.layer_box.currentLayer()
-            self.layer_box.currentLayer().startEditing()
-            self.layer_box.currentLayer().changeAttributeValue(self.feature().id(), self.layer_box.currentLayer().fields().indexOf('csv'),p)
-            self.layer_box.currentLayer().commitChanges()
+            layer = self.siteBox.layer
+            layer.startEditing()
+            layer.changeAttributeValue(self.siteBox.currentFid(), layer.fields().indexOf('csv'),p)
+            layer.commitChanges()
 
 
 
-    def nextSite(self):
-        self.siteBox.setCurrentIndex(min(self.siteBox.count(),self.siteBox.currentIndex()+1))
-    
-
-    def lastSite(self):
-        self.siteBox.setCurrentIndex(max(0,self.siteBox.currentIndex()-1))
-
-
-#str new_site
+    #str new_site
     def siteBoxChanged(self,index):
-        if self.siteBox.itemText(index):
+        feat = self.siteBox.currentFeature()
+        
+        if feat:
             
-            f = str(self.feature()['csv'])
+            f = str(feat['csv'])
                 
             if os.path.exists(f):
                 self.loadCsv(f)
             else:
                 self.clear()
-                    
+              
 
-    def segments(self):
-        layer = self.layer_box.currentLayer()
-        if layer:
-            vals = sorted(layer.uniqueValues(layer.fields().indexOf('segment_no')))
-            return [str(v) for v in vals]
-
-#attributes to dict
+    #attributes to dict
     def toDict(self):
         d = {k:widget_value.get_value(v['widget']) for k,v in self.key.items()}
-        d['site'] = self.site()
+        d['site'] = self.siteBox.currentValue()
         return d
 
 
-#opens help/index.html in default browser
+
+    #opens help/index.html in default browser
     def openHelp(self):
         help_path=os.path.join(os.path.dirname(__file__),'help','index.html')
         help_path='file:///'+os.path.abspath(help_path)
@@ -213,32 +179,16 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
 
         
 
-    def fromSelected(self):
-        sf=self.layer_box.currentLayer().selectedFeatures()
-
-        if len(sf)==0:
-            iface.messageBar().pushMessage('ssir generator: no features selected')
-
-        if len(sf)>1:
-            iface.messageBar().pushMessage('ssir generator: more than 1 feature selected')
-
-        if len(sf)==1:
-            i=self.siteBox.findText(str(int(sf[0]['site'])))
-            if i!=-1:
-                self.siteBox.setCurrentIndex(i)
-
-
-
-#returns list of features with form in folder. unused
-#needs folder to be set
+    #returns list of features with form in folder. unused
+    #needs folder to be set
     def surveyedFeatures(self):
         field='segment_no'
         return [f for f in self.layer_box.currentLayer().getFeatures() if os.path.exists(self.make_save_path(f[field]))]
 
 
 
-#returns list of features without form in folder. unused
-#needs folder to be set
+    #returns list of features without form in folder. unused
+    #needs folder to be set
     def unsurveyedFeatures(self):
         field='segment_no'
         return [f for f in self.layer_box.currentLayer().getFeatures() if not os.path.exists(self.make_save_path(f[field]))]
@@ -249,12 +199,12 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         self.loadDict(d)
 
             
-#load csv. loads last row with site=segment_no
+    #load csv. loads last row with site=segment_no
     def loadCsv(self,csv_file,sep=','):
-        s = self.site()
+        s = self.siteBox.currentValue()
         
         with open(csv_file,'r') as f:
-            reader=csv.DictReader(f,dialect='excel',delimiter=sep)
+            reader = csv.DictReader(f,dialect='excel',delimiter=sep)
             for row in reader:
                 if row['site']==s:
                     self.loadDict(row)
@@ -267,49 +217,26 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
             
             
 
-#save form to csv, replacing any existing row for site.
+    #save form to csv, replacing any existing row for site.
     def toCsv(self,csv_file,sep=','):
 
         if os.path.exists(csv_file):
 
         #remove existing row for site.
             with open(csv_file,'r') as f:
-                reader=csv.DictReader(f,dialect='excel',delimiter=sep)
-                dicts = [row for row in reader if row['site']!=self.site()]
-                            
+                reader = csv.DictReader(f,dialect='excel',delimiter=sep)
+                dicts = [row for row in reader if row['site']!=self.siteBox.currentValue()]#existing data for all other sites
+
+
             with open(csv_file,'w') as f:
-                w=csv.DictWriter(f,fieldnames=list(self.key.keys())+['site'],dialect='excel',delimiter=sep,lineterminator='\n')
+                w = csv.DictWriter(f,fieldnames=list(self.key.keys())+['site'],dialect='excel',delimiter=sep,lineterminator='\n')
                 w.writeheader()
-                [w.writerow(d) for d in dicts]
-                w.writerow(self.toDict())
+                [w.writerow(d) for d in dicts]#replace existing data
+                w.writerow(self.toDict())#add current data
 
         else:        
             with open(csv_file,'w') as f:
                 w=csv.DictWriter(f,fieldnames=list(self.key.keys())+['site'],dialect='excel',delimiter=sep,lineterminator='\n')
                 w.writeheader()
                 w.writerow(self.toDict())
-
-
-    #str
-    def site(self):
-        return self.siteBox.itemText(self.siteBox.currentIndex())
-
-
-    def feature(self):
-            
-        e='"segment_no"=%s'%(self.site())
-        request = QgsFeatureRequest().setFilterExpression(e)
-        feats = [f for f in self.layer_box.currentLayer().getFeatures(request)]
-
-        if len(feats)>1:
-            raise KeyError('more than 1 feature with segment_no of '+self.site())
-        if len(feats)==0:
-            raise KeyError('no features with segment_no of '+self.site())
-
-        return feats[0]
-        
-
-    def zoom(self):  
-        self.layer_box.currentLayer().selectByIds([self.feature().id()])#select segment
-        layer_functions.zoom_to_selected(self.layer_box.currentLayer())
 

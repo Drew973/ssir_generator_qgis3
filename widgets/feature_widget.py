@@ -1,29 +1,14 @@
-if __name__=='__console__':
-    import sys
-    p = r'C:\Users\drew.bennett\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\manytoonemapper\widgets'
-    sys.path.append(p)
-    import searchableComboBox
-    
-else:
-    from . import searchableComboBox
+from ssir_generator.widgets.searchable_combo_box import searchableComboBox
 
 
 
-from qgis.core import QgsFeatureRequest
 from qgis.utils import iface
-#from PyQt5.QtCore import pyqtSignal
-
 from PyQt5.QtCore import QSortFilterProxyModel
-'''
-'''
-
 from PyQt5.QtGui import QStandardItemModel
 
 
 
-class featureWidget(searchableComboBox.searchableComboBox):
-#
-  #  featuresChanged = pyqtSignal()
+class featureWidget(searchableComboBox):
     
     def __init__(self,parent=None):
         super().__init__(parent)
@@ -98,6 +83,18 @@ class featureWidget(searchableComboBox.searchableComboBox):
     
     def currentFid(self):
         return self.rowToFid(self.currentIndex())
+
+
+    def currentValue(self):
+        return self.itemText(self.currentIndex())
+
+    def currentFeature(self):
+        return self.layer.getFeature(self.currentFid())
+
+
+    def selectOnLayer(self):
+        self.layer.selectByIds([self.currentFid()])
+        zoomToSelected(self.layer)
 
 
 def singleQuote(s):

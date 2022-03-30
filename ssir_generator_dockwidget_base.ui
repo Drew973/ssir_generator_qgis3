@@ -27,7 +27,11 @@
       <item>
        <widget class="ssirLayerBox" name="layer_box">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'ui-monospace','SFMono-Regular','SF Mono','Menlo','Consolas','Liberation Mono','monospace'; font-size:12px; color:#24292f; background-color:#ffffff;&quot;&gt;Layer with sites. Only shows layers with the necessary fields. These are site(int/float/text and csv(text).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Layer with sites. Only shows layers with the necessary fields. These are site(int/float/text) and csv(text).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -56,7 +60,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="last_site_button">
+       <widget class="QPushButton" name="lastButton">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to previous site. WILL LOSE ANY UNSAVED CHANGES TO FORM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -66,14 +70,14 @@
        </widget>
       </item>
       <item>
-       <widget class="searchableComboBox" name="siteBox">
+       <widget class="featureWidget" name="siteBox">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current site. CHANGING THIS WILL LOSE ANY UNSAVED CHANGES TO FORM. Right click for more options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current site. &lt;span style=&quot; font-weight:600;&quot;&gt;CHANGING THIS WILL LOSE ANY UNSAVED CHANGES TO FORM&lt;/span&gt;. Right click for more options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="next_site_button">
+       <widget class="QPushButton" name="nextButton">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to next site. WILL LOSE ANY UNSAVED CHANGES TO FORM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -177,8 +181,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>546</width>
-           <height>265</height>
+           <width>219</width>
+           <height>139</height>
           </rect>
          </property>
          <attribute name="label">
@@ -239,8 +243,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>546</width>
-           <height>265</height>
+           <width>419</width>
+           <height>218</height>
           </rect>
          </property>
          <attribute name="label">
@@ -412,8 +416,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>546</width>
-           <height>265</height>
+           <width>384</width>
+           <height>102</height>
           </rect>
          </property>
          <attribute name="label">
@@ -489,8 +493,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>546</width>
-           <height>265</height>
+           <width>415</width>
+           <height>131</height>
           </rect>
          </property>
          <attribute name="label">
@@ -585,8 +589,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>546</width>
-           <height>265</height>
+           <width>468</width>
+           <height>131</height>
           </rect>
          </property>
          <attribute name="label">
@@ -774,14 +778,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>searchableComboBox</class>
-   <extends>QComboBox</extends>
-   <header>ssir_generator.widgets.searchableComboBox</header>
-  </customwidget>
-  <customwidget>
    <class>ssirLayerBox</class>
    <extends>QComboBox</extends>
    <header>ssir_generator.widgets.ssir_layer_box</header>
+  </customwidget>
+  <customwidget>
+   <class>featureWidget</class>
+   <extends>QComboBox</extends>
+   <header>ssir_generator.widgets.feature_widget</header>
   </customwidget>
  </customwidgets>
  <resources/>
