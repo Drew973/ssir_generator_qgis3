@@ -50,12 +50,11 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         self.initKey()
         self.help_button.clicked.connect(self.openHelp)
 
-
 #WritableLayer,VectorLayer,PointLayer
         self.layer_box.setFilters(QgsMapLayerProxyModel.VectorLayer|QgsMapLayerProxyModel.PointLayer)
-        self.filterLayers()
-        QgsProject.instance().layersAdded.connect(self.filterLayers)
         
+        #redo layerbox. doesn't notice when invalid layer becomes valid.
+        #subclass to fix this. did this somewhere?
         
         #special handling for comboboxes
         for k,v in self.key.items():
@@ -88,11 +87,6 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         self.siteBox.setContextMenuPolicy(Qt.CustomContextMenu);
         self.siteBox.customContextMenuRequested.connect(lambda pt:siteMenu.exec_(self.mapToGlobal(pt)))
         
-
-        
-    def filterLayers(self):
-        self.layer_box.setExceptedLayerList([layer for layer in QgsProject.instance().mapLayers().values() if not layerValid(layer)])   #QgsMapLayerRegistry.instance().mapLayers().values() for qgis2
-
 
 
   #create ordered dict self.key to link name of attribute to widget and default value
@@ -151,7 +145,6 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
             iface.messageBar().pushMessage('ssir generator:no layer')
             return
             
-        field='segment_no'
         if layerValid(layer):
             self.siteBox.clear()
             s = self.segments()
@@ -320,17 +313,3 @@ class ssirGeneratorDockWidget(QtWidgets.QDockWidget, Ui_ssir_generatorDockWidget
         self.layer_box.currentLayer().selectByIds([self.feature().id()])#select segment
         layer_functions.zoom_to_selected(self.layer_box.currentLayer())
 
-
-
-reqFields = {'site':{'types':['int','float','text']},'csv':{'types':['text']}}
-
-def layerValid(layer):
-
-    if isinstance(layer,QgsRasterLayer):
-        return False
-
-    for f in reqFields:
-        if layer.fields().indexOf(f)==-1:
-            return False           
-    return True
-    
